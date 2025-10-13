@@ -27,6 +27,7 @@ class TestSRUConfiguration(TestCase):
             "sru_version": configuration.sru_version,
             "username": configuration.username,
             "password": configuration.password,
+            "bearer_token": configuration.bearer_token,
         })
 
     def test_configuration_from_dict(self):
@@ -48,6 +49,7 @@ class TestSRUConfiguration(TestCase):
             "sru_version": configuration.sru_version,
             "username": configuration.username,
             "password": configuration.password,
+            "bearer_token": configuration.bearer_token,
         }
 
         configuration_from_saved_dict = SRUConfiguration(saved_dict)

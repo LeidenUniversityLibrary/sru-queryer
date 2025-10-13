@@ -62,6 +62,7 @@ class TestSearchRetrieve(unittest.TestCase):
         sru_configuration.default_records_returned = None
         sru_configuration.username = "test_user"
         sru_configuration.password = "test_password"
+        sru_configuration.bearer_token = "test_bearer_token"
 
         constructed_search_retrieve_request = SearchRetrieve(sru_configuration, AND(
             SearchClause("alma", "bib_holding_count", ">", "15"),

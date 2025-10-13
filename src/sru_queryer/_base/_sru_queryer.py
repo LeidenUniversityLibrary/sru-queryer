@@ -18,7 +18,7 @@ from ._search_retrieve import SearchRetrieve
 class SRUQueryer():
     supported_sru_versions = ["1.2", "1.1"]
     
-    def __init__(self, server_url: str = None, sru_version: str = None, username: str | None = None, password: str | None = None, default_cql_context_set: str | None = None, default_cql_index: str | None = None, default_cql_relation: str | None = None, disable_validation_for_cql_defaults: bool = False, max_records_supported: int | None = None, default_records_returned: int | None = None , default_record_schema: str | None = None, default_sort_schema: str | None = None, from_dict: dict | None = None):
+    def __init__(self, server_url: str = None, sru_version: str = None, username: str | None = None, password: str | None = None, bearer_token: str | None = None, default_cql_context_set: str | None = None, default_cql_index: str | None = None, default_cql_relation: str | None = None, disable_validation_for_cql_defaults: bool = False, max_records_supported: int | None = None, default_records_returned: int | None = None , default_record_schema: str | None = None, default_sort_schema: str | None = None, from_dict: dict | None = None):
         """Raises ExplainResponseContentTypeException, NoExplainResponseException, ExplainResponseParserException, or PermissionError"""
         # Ability to load from saved configuration. DO NOT CREATE MANUALLY.
         if from_dict:
@@ -36,7 +36,7 @@ class SRUQueryer():
 
         explain_response_xml: bytes = None
         try:
-            explain_response_xml = self._retrieve_explain_response_xml(formatted_explain_query, username, password)
+            explain_response_xml = self._retrieve_explain_response_xml(formatted_explain_query, username, password,bearer_token)
             configuration = self._parse_explain_response_configuration(explain_response_xml)
         except NoExplainResponseException as be:
             logging.exception(be.__str__())
@@ -73,6 +73,7 @@ class SRUQueryer():
         configuration.server_url = server_url
         configuration.username = username
         configuration.password = password
+        configuration.bearer_token = bearer_token
         configuration.disable_validation_for_cql_defaults = disable_validation_for_cql_defaults
 
         # Override SRUExplain values / set if not provided
@@ -165,8 +166,8 @@ class SRUQueryer():
         return new_dict
 
     @staticmethod
-    def _retrieve_explain_response_xml(server_url: str, username: str | None, password: str | None) -> dict:
-        response_content = SRUQueryer._get_request_contents(server_url, username, password)
+    def _retrieve_explain_response_xml(server_url: str, username: str | None, password: str | None, bearer_token: str | None) -> dict:
+        response_content = SRUQueryer._get_request_contents(server_url, username, password, bearer_token)
         try:
             content = xmltodict.parse(response_content)
         except Exception as e:
@@ -180,10 +181,13 @@ class SRUQueryer():
         return sru_dict_parser.get_sru_configuration_from_explain_response()
     
     @staticmethod
-    def _get_request_contents(url: str, username, password):
+    def _get_request_contents(url: str, username, password, bearer_token):
         """Sends a request and returns the contents - it's a seperate method so we can mock it."""
-
-        if username and password:
+        if bearer_token:
+            response = requests.get(url, headers={
+                "Authorization": f"Bearer {bearer_token}",
+            })
+        elif username and password:
             response = requests.get(url, headers={
                 "Authorization": SRUAuxiliaryFormatter.format_basic_access_authentication_header_payload(username, password)
             })

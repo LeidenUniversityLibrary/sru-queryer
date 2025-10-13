@@ -109,5 +109,6 @@ class SearchRetrieve:
         request = Request("GET", search_retrieve_query)
         if self.sru_configuration.username and self.sru_configuration.password:
             request.headers["Authorization"] = SRUAuxiliaryFormatter.format_basic_access_authentication_header_payload(self.sru_configuration.username, self.sru_configuration.password)
-
+        elif self.sru_configuration.bearer_token:
+            request.headers["Authorization"] = f"Bearer {self.sru_configuration.bearer_token}"
         return request

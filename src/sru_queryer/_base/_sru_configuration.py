@@ -58,4 +58,5 @@ class SRUConfiguration():
         self.sru_version: str = None
         self.username: str | None = None
         self.password: str | None = None
+        self.bearer_token: str | None = None
         self.disable_validation_for_cql_defaults: bool = False
