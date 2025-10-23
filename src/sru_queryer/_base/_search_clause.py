@@ -28,7 +28,7 @@ class SearchClause:
         if from_dict:
             try:
                 if from_dict["type"] != "searchClause":
-                    raise ValueError(f"Search Clause type '{from_dict["type"]}' is not valid")
+                    raise ValueError(f"Search Clause type '{from_dict['type']}' is not valid")
                 
                 if "context_set" in from_dict.keys():
                     self._context_set: str = from_dict["context_set"]
